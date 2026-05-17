@@ -33,3 +33,12 @@ async def upload_file(file: UploadFile = File(...)):
     )
     return {"message": "file uploaded successfully",
             "filename": file.filename}
+
+@app.get("/files")
+def receive_files():
+    response = s3.list_objects_v2(Bucket=bucket_name)
+    files = []
+    for item in response["Contents"]:
+        files.append(item["Key"])
+    return{"message":"files retrieved",
+           "files": files}
