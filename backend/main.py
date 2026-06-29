@@ -1,5 +1,5 @@
 from fastapi import FastAPI, UploadFile, File
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, StreamingResponse
 from dotenv import load_dotenv
 import boto3
 import os
@@ -49,5 +49,10 @@ def download_file(filename: str):
         Bucket = bucket_name, 
         Key = filename     
     )
-    file_content = response["Body"].read().decode("utf-8")
-    return {"message": "file downloaded", "filename": filename, "Content": file_content}
+    return StreamingResponse(
+        response["Body"],
+        media_type=response["ContentType"],
+        headers={
+        "Content-Disposition": f'attachment; filename="{filename}"'
+        }
+    )
