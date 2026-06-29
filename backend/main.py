@@ -42,3 +42,12 @@ def receive_files():
         files.append(item["Key"])
     return{"message":"files retrieved",
            "files": files}
+
+@app.get("/files/{filename}")
+def download_file(filename: str):
+    response = s3.get_object(
+        Bucket = bucket_name, 
+        Key = filename     
+    )
+    file_content = response["Body"].read().decode("utf-8")
+    return {"message": "file downloaded", "filename": filename, "Content": file_content}
