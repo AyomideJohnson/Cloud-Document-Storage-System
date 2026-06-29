@@ -38,7 +38,7 @@ async def upload_file(file: UploadFile = File(...)):
 def receive_files():
     response = s3.list_objects_v2(Bucket=bucket_name)
     files = []
-    for item in response["Contents"]:
+    for item in response.get("Contents", []):
         files.append(item["Key"])
     return{"message":"files retrieved",
            "files": files}
@@ -56,3 +56,10 @@ def download_file(filename: str):
         "Content-Disposition": f'attachment; filename="{filename}"'
         }
     )
+@app.delete("/files/{filename}")
+def delete_file(filename: str):
+    s3.delete_object(
+        Bucket = bucket_name, 
+        Key = filename  
+    )
+    return {"message": "file has been deleted", "filename": filename}
